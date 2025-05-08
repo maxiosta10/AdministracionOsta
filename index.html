@@ -1,122 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Formulario de Reparación</title>
+  <title>Formulario de Ticket</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f3f3f3;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
+      padding: 20px;
+      background: #f2f2f2;
     }
 
-    .form-container {
-      background-color: #ffffff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-    }
-
-    img.logo {
-      max-width: 200px;
-      margin-bottom: 20px;
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      max-width: 600px;
+      margin: auto;
     }
 
     label {
       display: block;
-      text-align: left;
-      margin: 10px 0 5px;
+      margin-top: 15px;
       font-weight: bold;
     }
 
-    input[type="text"],
-    input[type="date"],
-    input[type="file"],
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
       padding: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      margin-top: 5px;
       box-sizing: border-box;
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-
     input[type="submit"] {
-      background-color: #007bff;
+      margin-top: 20px;
+      background-color: #4CAF50;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
       cursor: pointer;
     }
 
     input[type="submit"]:hover {
-      background-color: #0056b3;
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
-  <div class="form-container">
-    <img class="logo" src="https://github.com/maxiosta10/AdministracionOsta/blob/main/logo.jpg?raw=true" alt="Logo">
 
-    <form action="https://script.google.com/macros/s/AKfycbyWO3_hxVwpw0v_5b1szEC9SsWkk9MhifGyWbn0H9z5MmeKYgG0AEQFfZ686fROazTk/exec" method="post" enctype="multipart/form-data" target="invisible_iframe">
-      <label for="fecha">Fecha</label>
-      <input type="date" id="fecha" name="fecha">
+  <form id="miFormulario" enctype="multipart/form-data">
+    <h2>Crear nuevo ticket</h2>
 
-      <label for="consorcio">Consorcio</label>
-      <select id="consorcio" name="consorcio">
-        <!-- Opciones serán agregadas dinámicamente -->
-      </select>
+    <label for="fecha">Fecha</label>
+    <input type="date" id="fecha" name="fecha" required>
 
-      <label for="piso">Piso</label>
-      <select id="piso" name="piso">
-        <!-- Opciones serán agregadas dinámicamente -->
-      </select>
+    <label for="consorcio">Consorcio</label>
+    <select id="consorcio" name="consorcio" required></select>
 
-      <label for="rubro">Rubro</label>
-      <select id="rubro" name="rubro">
-        <option value="electricidad">Electricidad</option>
-        <option value="plomeria">Plomería</option>
-        <option value="pintura">Pintura</option>
-        <option value="otros">Otros</option>
-      </select>
+    <label for="piso">Piso</label>
+    <select id="piso" name="piso" required></select>
 
-      <label for="descripcion">Descripción</label>
-      <textarea id="descripcion" name="descripcion" placeholder="Describí el problema..."></textarea>
+    <label for="rubro">Rubro</label>
+    <select id="rubro" name="rubro" required>
+      <option value="Electricidad">Electricidad</option>
+      <option value="Plomería">Plomería</option>
+      <option value="Pintura">Pintura</option>
+      <option value="Otros">Otros</option>
+    </select>
 
-      <label for="foto">Foto</label>
-      <input type="file" id="foto" name="foto" accept="image/*">
+    <label for="descripcion">Descripción</label>
+    <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describí el problema..." required></textarea>
 
-      <label for="nombre">Nombre</label>
-      <input type="text" id="nombre" name="nombre" placeholder="Tu nombre">
+    <label for="foto">Foto (opcional)</label>
+    <input type="file" id="foto" name="foto" accept="image/*">
 
-      <input type="submit" value="Enviar">
-    </form>
+    <label for="nombre">Tu nombre</label>
+    <input type="text" id="nombre" name="nombre" required>
 
-    <iframe name="invisible_iframe" style="display:none;"></iframe>
-  </div>
+    <input type="submit" value="Enviar Ticket">
+  </form>
 
   <script>
-    // Inicializar fecha con hoy
-    document.getElementById('fecha').valueAsDate = new Date();
+    // Inicializar fecha por defecto en hoy
+    document.getElementById("fecha").valueAsDate = new Date();
 
-    // Leer parámetros del URL
+    // Leer parámetros de URL y poblar selects
     const params = new URLSearchParams(window.location.search);
 
-    // Función para cargar opciones desde el URL
     function cargarOpciones(idCampo, paramNombre) {
       const campo = document.getElementById(idCampo);
       const opciones = params.get(paramNombre);
@@ -130,8 +97,32 @@
       }
     }
 
-    cargarOpciones('consorcio', 'consorcios');
-    cargarOpciones('piso', 'pisos');
+    cargarOpciones("consorcio", "consorcios");
+    cargarOpciones("piso", "pisos");
+
+    // Manejar envío con fetch
+    document.getElementById("miFormulario").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      fetch("https://script.google.com/macros/s/AKfycbyWO3_hxVwpw0v_5b1szEC9SsWkk9MhifGyWbn0H9z5MmeKYgG0AEQFfZ686fROazTk/exec", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert("¡Ticket enviado correctamente!");
+        form.reset();
+        document.getElementById("fecha").valueAsDate = new Date();
+      })
+      .catch(error => {
+        alert("Hubo un error al enviar el ticket.");
+        console.error(error);
+      });
+    });
   </script>
 </body>
 </html>
+
