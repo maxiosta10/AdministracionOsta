@@ -28,6 +28,7 @@
     }
 
     h2 {
+      font-size: 16px;
       text-align: center;
       color: #2c3e50;
       margin-bottom: 25px;
@@ -106,7 +107,7 @@
     <label for="foto">Foto</label>
     <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
 
-    <input type="submit" value="Enviar Ticket"> {/* Texto del botón más específico */}
+    <input type="submit" value="Enviar Ticket"> 
   </form>
 
   <script>
@@ -154,10 +155,10 @@
       const formData = new FormData(this);
       
       // Opcional: Deshabilitar botón mientras se envía (lo añadiremos en el paso de UX si quieres)
-      // const submitButton = this.querySelector('input[type="submit"]');
-      // const originalButtonText = submitButton.value;
-      // submitButton.disabled = true;
-      // submitButton.value = "Enviando...";
+      const submitButton = this.querySelector('input[type="submit"]');
+    const originalButtonText = submitButton.value;
+      submitButton.disabled = true;
+     submitButton.value = "Enviando...";
 
       fetch("https://script.google.com/macros/s/AKfycby4udpEwODGwCXjqVDYw-IwulfQZEEDs3F177A4LpNcQJ91vah-WBkCeicffph3vEmH/exec", {
         method: "POST",
@@ -185,12 +186,12 @@
         console.error("Error al enviar el formulario:", error);
         alert("Error al enviar el formulario."); // Mejoraremos este feedback
       })
-      // .finally(() => { // Para reactivar el botón
-      //    if(submitButton) {
-      //      submitButton.disabled = false;
-      //      submitButton.value = originalButtonText;
-      //    }
-      // });
+       .finally(() => { // Para reactivar el botón
+         if(submitButton) {
+           submitButton.disabled = false;
+           submitButton.value = originalButtonText;
+         }
+       });
     });
   </script>
 
