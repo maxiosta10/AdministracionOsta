@@ -6,29 +6,57 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: #f2f2f2;
+      background: #f4f7f6;
+      color: #333;
+      line-height: 1.6;
     }
 
     form {
       background: white;
-      padding: 20px;
-      border-radius: 5px;
+      padding: 25px 30px;
+      border-radius: 8px;
       max-width: 600px;
-      margin: auto;
+      margin: 30px auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-logo {
+      display: block;
+      margin: 0 auto 15px auto;
+      max-width: 100px;
+      height: auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 25px;
     }
 
     label {
       display: block;
-      margin-top: 15px;
+      margin-top: 20px;
+      margin-bottom: 8px;
       font-weight: bold;
+      font-size: 0.95em;
+      color: #34495e;
     }
 
-    input, select, textarea {
+    input, select, textarea { /* `select` se mantiene aquí por si se usa en otros lados, pero Consorcio ya no es select */
       width: 100%;
       padding: 8px;
       margin-top: 5px;
       box-sizing: border-box;
+      /* Los estilos más detallados para los inputs los veremos en el siguiente paso de UX */
     }
+    
+    /* Estilo base para input[type="text"], input[type="date"] que refinaremos luego */
+    input[type="text"],
+    input[type="date"] {
+        border: 1px solid #ccc; /* Añadimos un borde base que faltaba para consistencia visual inicial */
+        border-radius: 4px;
+    }
+
 
     input[type="submit"] {
       margin-top: 20px;
@@ -36,6 +64,8 @@
       color: white;
       border: none;
       cursor: pointer;
+      padding: 10px 15px; /* Añadimos un poco de padding al botón */
+      border-radius: 4px; /* Consistencia en bordes */
     }
 
     input[type="submit"]:hover {
@@ -46,16 +76,17 @@
 <body>
 
   <form id="miFormulario" enctype="multipart/form-data">
+    <img src="https://raw.githubusercontent.com/maxiosta10/AdministracionOsta/main/logo.jpg" alt="Logo Administración" class="form-logo">
+    
     <h2>Crear nuevo ticket</h2>
 
     <label for="fecha">Fecha</label>
     <input type="date" id="fecha" name="fecha" required>
 
     <label for="consorcio">Consorcio</label>
-    <select id="consorcio" name="consorcio" required>
-      <option value="Consorcio 1">Consorcio 1</option>
-      <option value="Consorcio 2">Consorcio 2</option>
-    </select>
+    <input type="text" id="consorcio" name="consorcio" required>
+    <label for="piso">Piso</label>
+    <input type="text" id="piso" name="piso">
 
     <label for="descripcion">Descripción</label>
     <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
@@ -67,11 +98,40 @@
   </form>
 
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Inicializar fecha con hoy
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = ('0' + (today.getMonth() + 1)).slice(-2); 
+      const day = ('0' + today.getDate()).slice(-2);
+      
+      const fechaInput = document.getElementById('fecha');
+      if (fechaInput) {
+        fechaInput.value = `${year}-${month}-${day}`;
+      }
+
+      // === SCRIPT PARA LEER PARÁMETROS DE URL Y RELLENAR CAMPOS ===
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const consorcioParam = urlParams.get('consorcio');
+      const pisoParam = urlParams.get('piso');
+
+      const consorcioInput = document.getElementById('consorcio');
+      const pisoInput = document.getElementById('piso');
+
+      if (consorcioParam && consorcioInput) {
+        consorcioInput.value = consorcioParam;
+      }
+
+      if (pisoParam && pisoInput) {
+        pisoInput.value = pisoParam;
+      }
+      // === FIN SCRIPT PARA PARÁMETROS DE URL ===
+    });
+
     document.getElementById("miFormulario").addEventListener("submit", function(event){
       event.preventDefault();
-      
       const formData = new FormData(this);
-
       fetch("https://script.google.com/macros/s/AKfycby4udpEwODGwCXjqVDYw-IwulfQZEEDs3F177A4LpNcQJ91vah-WBkCeicffph3vEmH/exec", {
         method: "POST",
         body: formData,
@@ -79,6 +139,26 @@
       }).then(response => {
         alert("Formulario enviado correctamente.");
         document.getElementById("miFormulario").reset();
+        
+        // Re-inicializar fecha después del reset
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = ('0' (today.getMonth() + 1)).slice(-2);
+        const day = ('0' + today.getDate()).slice(-2);
+        const fechaInput = document.getElementById('fecha');
+        if (fechaInput) {
+          fechaInput.value = `${year}-${month}-${day}`;
+        }
+        
+        // Opcional: Limpiar los campos que se rellenaron por URL si no quieres que persistan después del reset
+        // document.getElementById('consorcio').value = '';
+        // document.getElementById('piso').value = '';
+        // O si quieres que se vuelvan a rellenar desde la URL (aunque esto es menos común después de un submit exitoso):
+        // const urlParams = new URLSearchParams(window.location.search);
+        // if (urlParams.has('consorcio')) document.getElementById('consorcio').value = urlParams.get('consorcio');
+        // if (urlParams.has('piso')) document.getElementById('piso').value = urlParams.get('piso');
+
+
       }).catch(error => {
         console.error("Error al enviar el formulario:", error);
         alert("Error al enviar el formulario.");
