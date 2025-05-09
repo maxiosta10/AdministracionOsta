@@ -52,77 +52,40 @@
     <input type="date" id="fecha" name="fecha" required>
 
     <label for="consorcio">Consorcio</label>
-    <select id="consorcio" name="consorcio" required></select>
-
-    <label for="piso">Piso</label>
-    <select id="piso" name="piso" required></select>
-
-    <label for="rubro">Rubro</label>
-    <select id="rubro" name="rubro" required>
-      <option value="Electricidad">Electricidad</option>
-      <option value="Plomería">Plomería</option>
-      <option value="Pintura">Pintura</option>
-      <option value="Otros">Otros</option>
+    <select id="consorcio" name="consorcio" required>
+      <option value="Consorcio 1">Consorcio 1</option>
+      <option value="Consorcio 2">Consorcio 2</option>
     </select>
 
     <label for="descripcion">Descripción</label>
-    <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describí el problema..." required></textarea>
+    <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
 
-    <label for="foto">Foto (opcional)</label>
-    <input type="file" id="foto" name="foto" accept="image/*">
+    <label for="foto">Foto</label>
+    <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
 
-    <label for="nombre">Tu nombre</label>
-    <input type="text" id="nombre" name="nombre" required>
-
-    <input type="submit" value="Enviar Ticket">
+    <input type="submit" value="Enviar">
   </form>
 
   <script>
-    // Inicializar fecha por defecto en hoy
-    document.getElementById("fecha").valueAsDate = new Date();
+    document.getElementById("miFormulario").addEventListener("submit", function(event){
+      event.preventDefault();
+      
+      const formData = new FormData(this);
 
-    // Leer parámetros de URL y poblar selects
-    const params = new URLSearchParams(window.location.search);
-
-    function cargarOpciones(idCampo, paramNombre) {
-      const campo = document.getElementById(idCampo);
-      const opciones = params.get(paramNombre);
-      if (opciones) {
-        opciones.split(',').forEach(op => {
-          const option = document.createElement('option');
-          option.value = op.trim();
-          option.textContent = op.trim();
-          campo.appendChild(option);
-        });
-      }
-    }
-
-    cargarOpciones("consorcio", "consorcios");
-    cargarOpciones("piso", "pisos");
-
-    // Manejar envío con fetch
-    document.getElementById("miFormulario").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const form = e.target;
-      const formData = new FormData(form);
-
-      fetch("https://script.google.com/macros/s/AKfycbzUWrvkT_7jZOpQ4fomHRt3ApGqXvGeursHwLu5WoWeZ15PajBy8iPoYhSogZ1u5RvC/exec", {
+      fetch("https://script.google.com/macros/s/AKfycby4udpEwODGwCXjqVDYw-IwulfQZEEDs3F177A4LpNcQJ91vah-WBkCeicffph3vEmH/exec", {
         method: "POST",
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        alert("¡Ticket enviado correctamente!");
-        form.reset();
-        document.getElementById("fecha").valueAsDate = new Date();
-      })
-      .catch(error => {
-        alert("Hubo un error al enviar el ticket.");
-        console.error(error);
+        body: formData,
+        mode: "no-cors"
+      }).then(response => {
+        alert("Formulario enviado correctamente.");
+        document.getElementById("miFormulario").reset();
+      }).catch(error => {
+        console.error("Error al enviar el formulario:", error);
+        alert("Error al enviar el formulario.");
       });
     });
   </script>
+
 </body>
 </html>
 
