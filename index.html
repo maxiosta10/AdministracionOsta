@@ -41,22 +41,21 @@
       font-size: 0.95em;
       color: #34495e;
     }
+    
+    /* Indicador visual para campos requeridos (lo usaremos luego con CSS más específico) */
+    /* Por ahora, la clase 'required' está en el HTML para semántica */
 
-    input, select, textarea { /* `select` se mantiene aquí por si se usa en otros lados, pero Consorcio ya no es select */
+    input[type="text"],
+    input[type="date"],
+    select, /* Estilo para el nuevo select de Rubro */
+    textarea {
       width: 100%;
       padding: 8px;
-      margin-top: 5px;
+      margin-top: 5px; /* Este margen se ajustará/eliminará cuando refinemos los inputs */
       box-sizing: border-box;
-      /* Los estilos más detallados para los inputs los veremos en el siguiente paso de UX */
+      border: 1px solid #ccc; 
+      border-radius: 4px;
     }
-    
-    /* Estilo base para input[type="text"], input[type="date"] que refinaremos luego */
-    input[type="text"],
-    input[type="date"] {
-        border: 1px solid #ccc; /* Añadimos un borde base que faltaba para consistencia visual inicial */
-        border-radius: 4px;
-    }
-
 
     input[type="submit"] {
       margin-top: 20px;
@@ -64,8 +63,8 @@
       color: white;
       border: none;
       cursor: pointer;
-      padding: 10px 15px; /* Añadimos un poco de padding al botón */
-      border-radius: 4px; /* Consistencia en bordes */
+      padding: 10px 15px; 
+      border-radius: 4px; 
     }
 
     input[type="submit"]:hover {
@@ -85,84 +84,113 @@
 
     <label for="consorcio">Consorcio</label>
     <input type="text" id="consorcio" name="consorcio" required>
+
     <label for="piso">Piso</label>
     <input type="text" id="piso" name="piso">
 
+    <label for="nombre">Su Nombre</label>
+    <input type="text" id="nombre" name="nombre" required>
+    <label for="rubro">Rubro</label>
+    <select id="rubro" name="rubro" required>
+      <option value="" disabled selected>Seleccione un rubro</option>
+      <option value="ELECTRICIDAD">ELECTRICIDAD</option>
+      <option value="PLOMERIA">PLOMERIA</option>
+      <option value="PINTURA">PINTURA</option>
+      <option value="LIMPIEZA">LIMPIEZA</option>
+      <option value="AVERIAS">AVERIAS</option>
+      <option value="OTROS">OTROS</option>
+    </select>
     <label for="descripcion">Descripción</label>
     <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
 
     <label for="foto">Foto</label>
     <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
 
-    <input type="submit" value="Enviar">
+    <input type="submit" value="Enviar Ticket"> {/* Texto del botón más específico */}
   </form>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Inicializar fecha con hoy
+      // Inicializar fecha
       const today = new Date();
       const year = today.getFullYear();
       const month = ('0' + (today.getMonth() + 1)).slice(-2); 
       const day = ('0' + today.getDate()).slice(-2);
-      
       const fechaInput = document.getElementById('fecha');
       if (fechaInput) {
         fechaInput.value = `${year}-${month}-${day}`;
       }
 
-      // === SCRIPT PARA LEER PARÁMETROS DE URL Y RELLENAR CAMPOS ===
+      // Pre-rellenar desde URL
       const urlParams = new URLSearchParams(window.location.search);
-
       const consorcioParam = urlParams.get('consorcio');
       const pisoParam = urlParams.get('piso');
+      // Podríamos añadir también para nombre y rubro si quisieras pre-rellenarlos desde la URL
+      // const nombreParam = urlParams.get('nombre'); 
+      // const rubroParam = urlParams.get('rubro');
 
       const consorcioInput = document.getElementById('consorcio');
       const pisoInput = document.getElementById('piso');
+      // const nombreInput = document.getElementById('nombre');
+      // const rubroSelect = document.getElementById('rubro');
+
 
       if (consorcioParam && consorcioInput) {
         consorcioInput.value = consorcioParam;
       }
-
       if (pisoParam && pisoInput) {
         pisoInput.value = pisoParam;
       }
-      // === FIN SCRIPT PARA PARÁMETROS DE URL ===
+      // if (nombreParam && nombreInput) {
+      //  nombreInput.value = nombreParam;
+      // }
+      // if (rubroParam && rubroSelect) {
+      //  rubroSelect.value = rubroParam; // Esto seleccionaría la opción si el valor coincide
+      // }
     });
 
     document.getElementById("miFormulario").addEventListener("submit", function(event){
       event.preventDefault();
       const formData = new FormData(this);
+      
+      // Opcional: Deshabilitar botón mientras se envía (lo añadiremos en el paso de UX si quieres)
+      // const submitButton = this.querySelector('input[type="submit"]');
+      // const originalButtonText = submitButton.value;
+      // submitButton.disabled = true;
+      // submitButton.value = "Enviando...";
+
       fetch("https://script.google.com/macros/s/AKfycby4udpEwODGwCXjqVDYw-IwulfQZEEDs3F177A4LpNcQJ91vah-WBkCeicffph3vEmH/exec", {
         method: "POST",
         body: formData,
         mode: "no-cors"
       }).then(response => {
-        alert("Formulario enviado correctamente.");
+        alert("Formulario enviado correctamente."); // Mejoraremos este feedback en el paso de UX
         document.getElementById("miFormulario").reset();
         
         // Re-inicializar fecha después del reset
         const today = new Date();
         const year = today.getFullYear();
-        const month = ('0' (today.getMonth() + 1)).slice(-2);
+        const month = ('0' + (today.getMonth() + 1)).slice(-2);
         const day = ('0' + today.getDate()).slice(-2);
         const fechaInput = document.getElementById('fecha');
         if (fechaInput) {
           fechaInput.value = `${year}-${month}-${day}`;
         }
         
-        // Opcional: Limpiar los campos que se rellenaron por URL si no quieres que persistan después del reset
-        // document.getElementById('consorcio').value = '';
-        // document.getElementById('piso').value = '';
-        // O si quieres que se vuelvan a rellenar desde la URL (aunque esto es menos común después de un submit exitoso):
-        // const urlParams = new URLSearchParams(window.location.search);
-        // if (urlParams.has('consorcio')) document.getElementById('consorcio').value = urlParams.get('consorcio');
-        // if (urlParams.has('piso')) document.getElementById('piso').value = urlParams.get('piso');
-
+        // Comportamiento de campos de URL después del reset (como lo discutimos)
+        // Si cargaste la página con ?consorcio=X&piso=Y, esos valores reaparecerán aquí.
+        // Los nuevos campos 'nombre' y 'rubro' (que no se cargan por URL por defecto) quedarán vacíos.
 
       }).catch(error => {
         console.error("Error al enviar el formulario:", error);
-        alert("Error al enviar el formulario.");
-      });
+        alert("Error al enviar el formulario."); // Mejoraremos este feedback
+      })
+      // .finally(() => { // Para reactivar el botón
+      //    if(submitButton) {
+      //      submitButton.disabled = false;
+      //      submitButton.value = originalButtonText;
+      //    }
+      // });
     });
   </script>
 
