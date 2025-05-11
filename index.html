@@ -160,13 +160,20 @@
       submitButton.disabled = true;
      submitButton.value = "Enviando...";
 
-      fetch("https://script.google.com/macros/s/AKfycbySBL68FXc-XzPZljD8rpetPbysRbm4dXMj4yf8GkLs_Hn-Zxj_AIwdD6Y5zZ5BlnoN/exec", {
-        method: "POST",
-        body: formData,
-        mode: "no-cors"
-      }).then(response => {
-        alert("Formulario enviado correctamente."); // Mejoraremos este feedback en el paso de UX
-        document.getElementById("miFormulario").reset();
+      fetch("https://script.google.com/macros/s/AKfycbzMsf3EDOSB_EHMSZlCRIVm7qhtlUN1YYvahFhAoi_WOP5FBiwvNHzo_ve_qO6t17nl/exec", {
+  method: "POST",
+  body: formData
+})
+.then(response => response.text())
+.then(data => {
+  alert("Formulario enviado correctamente.");
+  console.log("Respuesta del servidor:", data);
+  document.getElementById("miFormulario").reset();
+})
+.catch(error => {
+  console.error("Error al enviar el formulario:", error);
+});
+
         
         // Re-inicializar fecha después del reset
         const today = new Date();
