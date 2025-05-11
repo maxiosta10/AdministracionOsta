@@ -115,66 +115,61 @@
   </form>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = ('0' + (today.getMonth() + 1)).slice(-2);
+    const day = ('0' + today.getDate()).slice(-2);
+    document.getElementById('fecha').value = `${year}-${month}-${day}`;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const consorcioParam = urlParams.get('consorcio');
+    const pisoParam = urlParams.get('piso');
+    if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
+    if (pisoParam) document.getElementById('piso').value = pisoParam;
+  });
+
+  document.getElementById("miFormulario").addEventListener("submit", function (event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    const submitButton = this.querySelector('input[type="submit"]');
+    const originalText = submitButton.value;
+    submitButton.disabled = true;
+    submitButton.value = "Enviando...";
+
+    fetch("https://script.google.com/macros/s/AKfycbxybzQwpyFUYZylGjTgUrh2qqmwwuKJsp8cxviMn4JFwrXECTpYWnNYR6dfrhjr0zHW/exec", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+      alert("Formulario enviado correctamente.");
+      console.log("Respuesta del servidor:", data);
+      document.getElementById("miFormulario").reset();
+
       const today = new Date();
       const year = today.getFullYear();
       const month = ('0' + (today.getMonth() + 1)).slice(-2);
       const day = ('0' + today.getDate()).slice(-2);
-      const fechaInput = document.getElementById('fecha');
-      if (fechaInput) {
-        fechaInput.value = `${year}-${month}-${day}`;
-      }
+      document.getElementById('fecha').value = `${year}-${month}-${day}`;
 
-      // Pre-rellenar campos desde la URL
       const urlParams = new URLSearchParams(window.location.search);
       const consorcioParam = urlParams.get('consorcio');
       const pisoParam = urlParams.get('piso');
       if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
       if (pisoParam) document.getElementById('piso').value = pisoParam;
+    })
+    .catch(error => {
+      console.error("Error al enviar el formulario:", error);
+      alert("Error al enviar el formulario. Intente nuevamente.");
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.value = originalText;
     });
-
-    document.getElementById("miFormulario").addEventListener("submit", function (event) {
-      event.preventDefault();
-      const formData = new FormData(this);
-      const submitButton = this.querySelector('input[type="submit"]');
-      const originalText = submitButton.value;
-      submitButton.disabled = true;
-      submitButton.value = "Enviando...";
-
-      fetch("https://script.google.com/macros/s/AKfycbwhD_lXBcLf7r-7fL1RoRB7iUBAWDAy-d3y2ZaA0ei082eew7NQI2xWnnVL-4-Q25Lr/exec", {
-        method: "POST",
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        alert("Formulario enviado correctamente.");
-        console.log("Respuesta del servidor:", data);
-        document.getElementById("miFormulario").reset();
-
-        // Volver a cargar fecha actual
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = ('0' + (today.getMonth() + 1)).slice(-2);
-        const day = ('0' + today.getDate()).slice(-2);
-        document.getElementById('fecha').value = `${year}-${month}-${day}`;
-
-        // Recargar valores desde la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const consorcioParam = urlParams.get('consorcio');
-        const pisoParam = urlParams.get('piso');
-        if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
-        if (pisoParam) document.getElementById('piso').value = pisoParam;
-      })
-      .catch(error => {
-        console.error("Error al enviar el formulario:", error);
-        alert("Error al enviar el formulario. Intente nuevamente.");
-      })
-      .finally(() => {
-        submitButton.disabled = false;
-        submitButton.value = originalText;
-      });
-    });
-  </script>
+  });
+</script>
+  
 </body>
 </html>
 
