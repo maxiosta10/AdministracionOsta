@@ -42,30 +42,32 @@
       font-size: 0.95em;
       color: #34495e;
     }
-    
-    /* Indicador visual para campos requeridos (lo usaremos luego con CSS más específico) */
-    /* Por ahora, la clase 'required' está en el HTML para semántica */
 
     input[type="text"],
     input[type="date"],
-    select, /* Estilo para el nuevo select de Rubro */
+    select,
     textarea {
       width: 100%;
       padding: 8px;
-      margin-top: 5px; /* Este margen se ajustará/eliminará cuando refinemos los inputs */
       box-sizing: border-box;
-      border: 1px solid #ccc; 
+      border: 1px solid #ccc;
       border-radius: 4px;
     }
 
+    input[type="file"] {
+      margin-top: 10px;
+    }
+
     input[type="submit"] {
-      margin-top: 20px;
+      margin-top: 25px;
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
-      padding: 10px 15px; 
-      border-radius: 4px; 
+      padding: 10px 15px;
+      border-radius: 4px;
+      width: 100%;
+      font-size: 1em;
     }
 
     input[type="submit"]:hover {
@@ -77,7 +79,7 @@
 
   <form id="miFormulario" enctype="multipart/form-data">
     <img src="https://raw.githubusercontent.com/maxiosta10/AdministracionOsta/main/logo.jpg" alt="Logo Administración" class="form-logo">
-    
+
     <h2>Crear nuevo ticket</h2>
 
     <label for="fecha">Fecha</label>
@@ -91,6 +93,7 @@
 
     <label for="nombre">Su Nombre</label>
     <input type="text" id="nombre" name="nombre" required>
+
     <label for="rubro">Rubro</label>
     <select id="rubro" name="rubro" required>
       <option value="" disabled selected>Seleccione un rubro</option>
@@ -101,107 +104,77 @@
       <option value="AVERIAS">AVERIAS</option>
       <option value="OTROS">OTROS</option>
     </select>
+
     <label for="descripcion">Descripción</label>
     <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
 
     <label for="foto">Foto</label>
     <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
 
-    <input type="submit" value="Enviar Ticket"> 
+    <input type="submit" value="Enviar Ticket">
   </form>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Inicializar fecha
+    document.addEventListener('DOMContentLoaded', function () {
       const today = new Date();
       const year = today.getFullYear();
-      const month = ('0' + (today.getMonth() + 1)).slice(-2); 
+      const month = ('0' + (today.getMonth() + 1)).slice(-2);
       const day = ('0' + today.getDate()).slice(-2);
       const fechaInput = document.getElementById('fecha');
       if (fechaInput) {
         fechaInput.value = `${year}-${month}-${day}`;
       }
 
-      // Pre-rellenar desde URL
+      // Pre-rellenar campos desde la URL
       const urlParams = new URLSearchParams(window.location.search);
       const consorcioParam = urlParams.get('consorcio');
       const pisoParam = urlParams.get('piso');
-      // Podríamos añadir también para nombre y rubro si quisieras pre-rellenarlos desde la URL
-      // const nombreParam = urlParams.get('nombre'); 
-      // const rubroParam = urlParams.get('rubro');
-
-      const consorcioInput = document.getElementById('consorcio');
-      const pisoInput = document.getElementById('piso');
-      // const nombreInput = document.getElementById('nombre');
-      // const rubroSelect = document.getElementById('rubro');
-
-
-      if (consorcioParam && consorcioInput) {
-        consorcioInput.value = consorcioParam;
-      }
-      if (pisoParam && pisoInput) {
-        pisoInput.value = pisoParam;
-      }
-      // if (nombreParam && nombreInput) {
-      //  nombreInput.value = nombreParam;
-      // }
-      // if (rubroParam && rubroSelect) {
-      //  rubroSelect.value = rubroParam; // Esto seleccionaría la opción si el valor coincide
-      // }
+      if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
+      if (pisoParam) document.getElementById('piso').value = pisoParam;
     });
 
-    document.getElementById("miFormulario").addEventListener("submit", function(event){
+    document.getElementById("miFormulario").addEventListener("submit", function (event) {
       event.preventDefault();
       const formData = new FormData(this);
-      
-      // Opcional: Deshabilitar botón mientras se envía (lo añadiremos en el paso de UX si quieres)
       const submitButton = this.querySelector('input[type="submit"]');
-    const originalButtonText = submitButton.value;
+      const originalText = submitButton.value;
       submitButton.disabled = true;
-     submitButton.value = "Enviando...";
+      submitButton.value = "Enviando...";
 
-      fetch("https://script.google.com/macros/s/AKfycbzMsf3EDOSB_EHMSZlCRIVm7qhtlUN1YYvahFhAoi_WOP5FBiwvNHzo_ve_qO6t17nl/exec", {
-  method: "POST",
-  body: formData
-})
-.then(response => response.text())
-.then(data => {
-  alert("Formulario enviado correctamente.");
-  console.log("Respuesta del servidor:", data);
-  document.getElementById("miFormulario").reset();
-})
-.catch(error => {
-  console.error("Error al enviar el formulario:", error);
-});
+      fetch("https://script.google.com/macros/s/AKfycbwhD_lXBcLf7r-7fL1RoRB7iUBAWDAy-d3y2ZaA0ei082eew7NQI2xWnnVL-4-Q25Lr/exec", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert("Formulario enviado correctamente.");
+        console.log("Respuesta del servidor:", data);
+        document.getElementById("miFormulario").reset();
 
-        
-        // Re-inicializar fecha después del reset
+        // Volver a cargar fecha actual
         const today = new Date();
         const year = today.getFullYear();
         const month = ('0' + (today.getMonth() + 1)).slice(-2);
         const day = ('0' + today.getDate()).slice(-2);
-        const fechaInput = document.getElementById('fecha');
-        if (fechaInput) {
-          fechaInput.value = `${year}-${month}-${day}`;
-        }
-        
-        // Comportamiento de campos de URL después del reset (como lo discutimos)
-        // Si cargaste la página con ?consorcio=X&piso=Y, esos valores reaparecerán aquí.
-        // Los nuevos campos 'nombre' y 'rubro' (que no se cargan por URL por defecto) quedarán vacíos.
+        document.getElementById('fecha').value = `${year}-${month}-${day}`;
 
-      }).catch(error => {
-        console.error("Error al enviar el formulario:", error);
-        alert("Error al enviar el formulario."); // Mejoraremos este feedback
+        // Recargar valores desde la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const consorcioParam = urlParams.get('consorcio');
+        const pisoParam = urlParams.get('piso');
+        if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
+        if (pisoParam) document.getElementById('piso').value = pisoParam;
       })
-       .finally(() => { // Para reactivar el botón
-         if(submitButton) {
-           submitButton.disabled = false;
-           submitButton.value = originalButtonText;
-         }
-       });
+      .catch(error => {
+        console.error("Error al enviar el formulario:", error);
+        alert("Error al enviar el formulario. Intente nuevamente.");
+      })
+      .finally(() => {
+        submitButton.disabled = false;
+        submitButton.value = originalText;
+      });
     });
   </script>
-
 </body>
 </html>
 
