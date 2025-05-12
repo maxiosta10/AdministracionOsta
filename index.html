@@ -116,17 +116,19 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Pongo la fecha de hoy por defecto
     const today = new Date();
     const year = today.getFullYear();
     const month = ('0' + (today.getMonth() + 1)).slice(-2);
     const day = ('0' + today.getDate()).slice(-2);
     document.getElementById('fecha').value = `${year}-${month}-${day}`;
 
+    // Cargo consorcio y piso desde parámetros de URL
     const urlParams = new URLSearchParams(window.location.search);
     const consorcioParam = urlParams.get('consorcio');
     const pisoParam = urlParams.get('piso');
     if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
-    if (pisoParam) document.getElementById('piso').value = pisoParam;
+    if (pisoParam)    document.getElementById('piso').value      = pisoParam;
   });
 
   document.getElementById("miFormulario").addEventListener("submit", function (event) {
@@ -134,30 +136,36 @@
     const formData = new FormData(this);
     const submitButton = this.querySelector('input[type="submit"]');
     const originalText = submitButton.value;
-    submitButton.disabled = true;
-    submitButton.value = "Enviando...";
 
-    fetch("https://script.google.com/macros/s/AKfycbyVE5vwi7SuO5o-aF0Lv_hsWq3dUX-DcZh4hYwWdkv_sk1bsieThMpRFPG3Hq5YIagx/exec", {
+    submitButton.disabled = true;
+    submitButton.value    = "Enviando...";
+
+    fetch("https://script.google.com/macros/s/AKfycbzh5amHTDnNRarrIWm0RkVOPD6ZTR95OMvGiGVHU7kXM3EOUcfDhFBfzlAmlwx3GyxD/exec", {
       method: "POST",
       body: formData
     })
-    .then(response => response.text())
-    .then(data => {
-      alert("Formulario enviado correctamente.");
-      console.log("Respuesta del servidor:", data);
-      document.getElementById("miFormulario").reset();
-
+    .then(response => response.json())          // parseo JSON
+    .then(json => {
+      if (json.success) {
+        alert("Formulario enviado correctamente.");
+      } else {
+        alert("Error al enviar: " + (json.error || "desconocido"));
+      }
+      console.log("Respuesta del servidor:", json);
+      
+      // Limpio el form y vuelvo a setear la fecha/URL params
+      this.reset();
       const today = new Date();
-      const year = today.getFullYear();
+      const year  = today.getFullYear();
       const month = ('0' + (today.getMonth() + 1)).slice(-2);
-      const day = ('0' + today.getDate()).slice(-2);
+      const day   = ('0' + today.getDate()).slice(-2);
       document.getElementById('fecha').value = `${year}-${month}-${day}`;
 
       const urlParams = new URLSearchParams(window.location.search);
       const consorcioParam = urlParams.get('consorcio');
-      const pisoParam = urlParams.get('piso');
+      const pisoParam      = urlParams.get('piso');
       if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
-      if (pisoParam) document.getElementById('piso').value = pisoParam;
+      if (pisoParam)      document.getElementById('piso').value      = pisoParam;
     })
     .catch(error => {
       console.error("Error al enviar el formulario:", error);
@@ -165,7 +173,7 @@
     })
     .finally(() => {
       submitButton.disabled = false;
-      submitButton.value = originalText;
+      submitButton.value    = originalText;
     });
   });
 </script>
