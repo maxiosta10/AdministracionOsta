@@ -6,17 +6,17 @@
   <title>Formulario de Ticket</title>
   <style>
     :root {
-      --primary-color: #4A90E2;
-      --primary-hover: #357ABD;
-      --bg-page: #f4f7f6;
+      --primary-color: #0052CC;
+      --primary-hover: #003A99;
+      --bg-page: #e8f1fc;
       --bg-form: #ffffff;
-      --text-color: #333333;
-      --label-color: #34495e;
-      --input-border: #ccc;
+      --text-color: #1f2937;
+      --label-color: #374151;
+      --input-border: #cbd5e1;
       --input-focus: var(--primary-color);
-      --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       --radius: 8px;
-      --transition: 0.2s ease;
+      --transition: 0.3s ease;
     }
     * { box-sizing: border-box; }
     body {
@@ -30,25 +30,33 @@
       align-items: flex-start;
       min-height: 100vh;
     }
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo-container img {
+      max-width: 160px;
+      height: auto;
+    }
     form {
       background-color: var(--bg-form);
-      padding: 30px;
+      padding: 40px;
       border-radius: var(--radius);
-      max-width: 500px;
+      max-width: 520px;
       width: 100%;
       box-shadow: var(--shadow);
       display: grid;
-      grid-row-gap: 20px;
+      grid-row-gap: 22px;
     }
-    h2 { margin: 0 0 10px; font-size: 1.5rem; text-align: center; color: var(--primary-color); }
-    label { display: block; font-weight: 600; color: var(--label-color); margin-bottom: 6px; }
+    h2 { margin: 0 0 12px; font-size: 1.6rem; text-align: center; color: var(--primary-color); }
+    label { display: block; font-weight: 600; color: var(--label-color); margin-bottom: 8px; }
     input[type="text"],
     input[type="date"],
     select,
     textarea,
     input[type="file"] {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid var(--input-border);
       border-radius: var(--radius);
       font-size: 1rem;
@@ -59,14 +67,14 @@
     textarea:focus {
       outline: none;
       border-color: var(--input-focus);
-      box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+      box-shadow: 0 0 0 4px rgba(0,82,204,0.2);
     }
-    textarea { resize: vertical; min-height: 100px; }
+    textarea { resize: vertical; min-height: 120px; }
     button {
       background-color: var(--primary-color);
       color: #fff;
       border: none;
-      padding: 12px;
+      padding: 14px;
       font-size: 1.1rem;
       border-radius: var(--radius);
       cursor: pointer;
@@ -75,33 +83,36 @@
     }
     button:hover {
       background-color: var(--primary-hover);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
     }
     #successMsg {
       display: none;
       text-align: center;
       padding: 30px;
       border-radius: var(--radius);
-      background: #eaf8e8;
-      color: #2e7d32;
-      font-size: 1.2rem;
+      background: #e2f0e7;
+      color: #1b4332;
+      font-size: 1.25rem;
       font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     #ticketNumber {
       display: block;
-      margin-top: 10px;
+      margin-top: 12px;
       font-size: 1.6rem;
-      color: #1b5e20;
+      color: #1b3a57;
     }
     @media (max-width: 480px) {
-      body { padding: 10px; }
-      form { padding: 20px; }
-      h2 { font-size: 1.3rem; }
+      body { padding: 12px; }
+      form { padding: 24px; }
+      h2 { font-size: 1.4rem; }
     }
   </style>
 </head>
 <body>
+  <div class="logo-container">
+    <img src="https://raw.githubusercontent.com/maxiosta10/AdministracionOsta/main/logo.jpg" alt="Logo OSTA">
+  </div>
   <form id="miFormulario">
     <h2>Crear nuevo ticket</h2>
 
@@ -160,18 +171,15 @@
   </div>
 
   <script>
-    // — REEMPLAZA por tu URL de Web App desplegado —
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzgF5opU-YfG9Y-gqv-5A8_CtlZG1TJBwCwCAEeLqhrKG2XBukDc4i4J7RifaOuN6mb/exec';
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1) Fecha de hoy
       const hoy = new Date();
       const yyyy = hoy.getFullYear();
       const mm = String(hoy.getMonth()+1).padStart(2,'0');
       const dd = String(hoy.getDate()).padStart(2,'0');
       document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
 
-      // 2) Leer consorcio desde query param (?consorcio=XYZ)
       const params = new URLSearchParams(window.location.search);
       const cons = params.get('consorcio') || '';
       if (cons) {
@@ -179,13 +187,11 @@
         fetchPisos(cons);
       }
 
-      // 3) Cuando cambie el consorcio, recargar pisos
       document.getElementById('consorcio').addEventListener('change', e => {
         fetchPisos(e.target.value);
       });
     });
 
-    // Función para obtener y poblar pisos
     async function fetchPisos(consorcio) {
       const sel = document.getElementById('piso');
       sel.innerHTML = '<option value="">Cargando…</option>';
@@ -195,9 +201,7 @@
         sel.innerHTML = '';
         if (pisos.length) {
           pisos.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p; 
-            opt.textContent = p;
+            const opt = document.createElement('option'); opt.value = p; opt.textContent = p;
             sel.appendChild(opt);
           });
         } else {
@@ -209,24 +213,20 @@
       }
     }
 
-    // Envío del formulario
     document.getElementById('btnEnviar').addEventListener('click', async function() {
-      const btn = this;
-      const orig = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Enviando…';
+      const btn = this; const orig = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Enviando…';
 
       const form = document.getElementById('miFormulario');
       const data = {
-        fecha:      form.fecha.value,
-        consorcio:  form.consorcio.value,
-        piso:       form.piso.value,
-        nombre:     form.nombre.value,
-        rubro:      form.rubro.value,
-        descripcion:form.descripcion.value
+        fecha: form.fecha.value,
+        consorcio: form.consorcio.value,
+        piso: form.piso.value,
+        nombre: form.nombre.value,
+        rubro: form.rubro.value,
+        descripcion: form.descripcion.value
       };
 
-      // Si hay foto, la convertimos a Base64
       const fileInput = document.getElementById('foto');
       if (fileInput.files.length) {
         const reader = new FileReader();
@@ -258,12 +258,12 @@
           }
         } catch (err) {
           alert('Error: ' + err.message);
-          btn.disabled = false;
-          btn.textContent = orig;
+          btn.disabled = false; btn.textContent = orig;
         }
       }
     });
   </script>
 </body>
 </html>
+
 
