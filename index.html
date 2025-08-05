@@ -1,188 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formulario de Ticket</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f4f7f6;
-      color: #333;
-      line-height: 1.6;
-    }
-
-    form {
-      background: white;
-      padding: 25px 30px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin: 30px auto;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-logo {
-      display: block;
-      margin: 0 auto 15px auto;
-      max-width: 100px;
-      height: auto;
-    }
-
-    h2 {
-      font-size: 16px;
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: block;
-      margin-top: 20px;
-      margin-bottom: 8px;
-      font-weight: bold;
-      font-size: 0.95em;
-      color: #34495e;
-    }
-
-    input[type="text"],
-    input[type="date"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    input[type="file"] {
-      margin-top: 10px;
-    }
-
-    input[type="submit"] {
-      margin-top: 25px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      padding: 10px 15px;
-      border-radius: 4px;
-      width: 100%;
-      font-size: 1em;
-    }
-
-    input[type="submit"]:hover {
-      background-color: #45a049;
-    }
+    /* ... tu CSS existente ... */
   </style>
 </head>
 <body>
-
-  <form id="miFormulario" enctype="multipart/form-data">
-    <img src="https://github.com/maxiosta10/AdministracionOsta/raw/main/logo.jpg" alt="Logo Administración" class="form-logo">
-
+  <form id="miFormulario">
     <h2>Crear nuevo ticket</h2>
-
-    <label for="fecha">Fecha</label>
-    <input type="date" id="fecha" name="fecha" required>
-
-    <label for="consorcio">Consorcio</label>
-    <input type="text" id="consorcio" name="consorcio" required>
-
-    <label for="piso">Piso</label>
-    <input type="text" id="piso" name="piso">
-
-    <label for="nombre">Su Nombre</label>
-    <input type="text" id="nombre" name="nombre" required>
-
-    <label for="rubro">Rubro</label>
-    <select id="rubro" name="rubro" required>
-      <option value="" disabled selected>Seleccione un rubro</option>
-      <option value="ELECTRICIDAD">ELECTRICIDAD</option>
-      <option value="PLOMERIA">PLOMERIA</option>
-      <option value="PINTURA">PINTURA</option>
-      <option value="LIMPIEZA">LIMPIEZA</option>
-      <option value="AVERIAS">AVERIAS</option>
-      <option value="OTROS">OTROS</option>
-    </select>
-
-    <label for="descripcion">Descripción</label>
-    <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
-
-    <label for="foto">Foto</label>
-    <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
-
-    <input type="submit" value="Enviar Ticket">
+    <div>
+      <label for="fecha">Fecha</label>
+      <input type="date" id="fecha" name="fecha" required>
+    </div>
+    <div>
+      <label for="consorcio">Consorcio</label>
+      <input type="text" id="consorcio" name="consorcio" required>
+    </div>
+    <div>
+      <label for="piso">Piso</label>
+      <select id="piso" name="piso" required>
+        <option value="">Cargando…</option>
+      </select>
+    </div>
+    <!-- resto de campos igual -->
+    <div>
+      <label for="foto">Foto</label>
+      <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
+    </div>
+    <button type="button" id="btnEnviar">Enviar Ticket</button>
   </form>
 
+  <div id="successMsg" style="display:none">
+    <p>¡Ticket enviado con éxito!</p>
+    <span id="ticketNumber"></span>
+    <button onclick="location.reload()">Enviar otro ticket</button>
+  </div>
+
   <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Pongo la fecha de hoy por defecto
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = ('0' + (today.getMonth() + 1)).slice(-2);
-    const day = ('0' + today.getDate()).slice(-2);
-    document.getElementById('fecha').value = `${year}-${month}-${day}`;
+    // — URL de tu Web App (la que obtuviste al desplegar el Code.gs) —
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzgF5opU-YfG9Y-gqv-5A8_CtlZG1TJBwCwCAEeLqhrKG2XBukDc4i4J7RifaOuN6mb/exec';
 
-    // Cargo consorcio y piso desde parámetros de URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const consorcioParam = urlParams.get('consorcio');
-    const pisoParam = urlParams.get('piso');
-    if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
-    if (pisoParam)    document.getElementById('piso').value      = pisoParam;
-  });
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1) Fecha de hoy
+      const hoy = new Date();
+      const yyyy = hoy.getFullYear();
+      const mm = String(hoy.getMonth()+1).padStart(2,'0');
+      const dd = String(hoy.getDate()).padStart(2,'0');
+      document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
 
-  document.getElementById("miFormulario").addEventListener("submit", function (event) {
-    event.preventDefault();
-    const formData = new FormData(this);
-    const submitButton = this.querySelector('input[type="submit"]');
-    const originalText = submitButton.value;
+      // 2) Leer consorcio desde query param si viene: ?consorcio=XYZ
+      const params = new URLSearchParams(window.location.search);
+      const cons = params.get('consorcio') || '';
+      document.getElementById('consorcio').value = cons;
 
-    submitButton.disabled = true;
-    submitButton.value    = "Enviando...";
+      // 3) Poblar pisos si hay consorcio
+      if (cons) fetchPisos(cons);
 
-    fetch("https://script.google.com/macros/s/AKfycbzh5amHTDnNRarrIWm0RkVOPD6ZTR95OMvGiGVHU7kXM3EOUcfDhFBfzlAmlwx3GyxD/exec", {
-      method: "POST",
-      body: formData
-    })
-    .then(response => response.json())          // parseo JSON
-    .then(json => {
-  if (json.success) {
-    document.getElementById("miFormulario").innerHTML = `
-      <div style="text-align:center; padding:50px;">
-        <h2 style="color:#4CAF50;">¡Ticket enviado con éxito!</h2>
-        <p>Gracias por registrar tu solicitud. Nos pondremos en contacto si es necesario.</p>
-      </div>`;
-  } else {
-    alert("Error al enviar: " + (json.error || "desconocido"));
-  }
-})
-      console.log("Respuesta del servidor:", json);
-      
-      // Limpio el form y vuelvo a setear la fecha/URL params
-      this.reset();
-      const today = new Date();
-      const year  = today.getFullYear();
-      const month = ('0' + (today.getMonth() + 1)).slice(-2);
-      const day   = ('0' + today.getDate()).slice(-2);
-      document.getElementById('fecha').value = `${year}-${month}-${day}`;
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const consorcioParam = urlParams.get('consorcio');
-      const pisoParam      = urlParams.get('piso');
-      if (consorcioParam) document.getElementById('consorcio').value = consorcioParam;
-      if (pisoParam)      document.getElementById('piso').value      = pisoParam;
-    })
-    .catch(error => {
-      console.error("Error al enviar el formulario:", error);
-      alert("Error al enviar el formulario. Intente nuevamente.");
-    })
-    .finally(() => {
-      submitButton.disabled = false;
-      submitButton.value    = originalText;
+      // 4) Cuando cambie el consorcio, recargar pisos
+      document.getElementById('consorcio').addEventListener('change', e => {
+        fetchPisos(e.target.value);
+      });
     });
-  });
-</script>
-  
+
+    // Función para pedir pisos
+    async function fetchPisos(consorcio) {
+      const sel = document.getElementById('piso');
+      sel.innerHTML = '<option value="">Cargando…</option>';
+      try {
+        const resp = await fetch(`${WEB_APP_URL}?action=getPisos&consorcio=${encodeURIComponent(consorcio)}`);
+        const json = await resp.json();
+        sel.innerHTML = '';
+        if (json.pisos && json.pisos.length) {
+          json.pisos.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p; opt.textContent = p;
+            sel.appendChild(opt);
+          });
+        } else {
+          sel.innerHTML = '<option value="">No hay pisos</option>';
+        }
+      } catch (err) {
+        sel.innerHTML = '<option value="">Error cargando</option>';
+        console.error(err);
+      }
+    }
+
+    // Envío del formulario
+    document.getElementById('btnEnviar').addEventListener('click', async function() {
+      const btn = this;
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Enviando…';
+
+      const form = document.getElementById('miFormulario');
+      const data = {
+        fecha: form.fecha.value,
+        consorcio: form.consorcio.value,
+        piso: form.piso.value,
+        nombre: form.nombre.value,
+        rubro: form.rubro.value,
+        descripcion: form.descripcion.value
+      };
+
+      const fileInput = document.getElementById('foto');
+      if (fileInput.files.length) {
+        const reader = new FileReader();
+        reader.onload = async e => {
+          const base = e.target.result.split(',')[1];
+          data.fotoData = base;
+          data.fotoType = fileInput.files[0].type;
+          data.fotoName = fileInput.files[0].name;
+          await enviarData();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        await enviarData();
+      }
+
+      async function enviarData() {
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(data)
+          });
+          const resJson = await resp.json();
+          if (resJson.success) {
+            document.getElementById('ticketNumber').textContent = "N° de ticket: " + resJson.ticketNumber;
+            form.style.display = 'none';
+            document.getElementById('successMsg').style.display = 'block';
+          } else {
+            throw new Error(resJson.error);
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+          btn.disabled = false;
+          btn.textContent = orig;
+        }
+      }
+    });
+  </script>
 </body>
 </html>
 
