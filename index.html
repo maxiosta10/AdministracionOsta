@@ -110,10 +110,10 @@
   </style>
 </head>
 <body>
-  <div class="logo-container">
-    <img src="https://raw.githubusercontent.com/maxiosta10/AdministracionOsta/main/logo.jpg" alt="Logo OSTA">
-  </div>
   <form id="miFormulario">
+    <div class="logo-container">
+      <img src="https://raw.githubusercontent.com/maxiosta10/AdministracionOsta/main/logo.jpg" alt="Logo OSTA">
+    </div>
     <h2>Crear nuevo ticket</h2>
 
     <div>
@@ -127,7 +127,7 @@
     </div>
 
     <div>
-      <label for="piso">Piso</label>
+      <label for="piso">Piso</nlabel>
       <select id="piso" name="piso" required>
         <option value="">Seleccione un piso</option>
       </select>
@@ -257,7 +257,7 @@
             throw new Error(resJson.error);
           }
         } catch (err) {
-          alert('Error: ' + err.message);
+         alert('Error: ' + err.message);
           btn.disabled = false; btn.textContent = orig;
         }
       }
@@ -265,5 +265,4 @@
   </script>
 </body>
 </html>
-
 
