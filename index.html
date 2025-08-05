@@ -2,45 +2,165 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Formulario de Ticket</title>
   <style>
-    /* ... tu CSS existente ... */
+    :root {
+      --primary-color: #4A90E2;
+      --primary-hover: #357ABD;
+      --bg-page: #f4f7f6;
+      --bg-form: #ffffff;
+      --text-color: #333333;
+      --label-color: #34495e;
+      --input-border: #ccc;
+      --input-focus: var(--primary-color);
+      --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      --radius: 8px;
+      --transition: 0.2s ease;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    form {
+      background-color: var(--bg-form);
+      padding: 30px;
+      border-radius: var(--radius);
+      max-width: 500px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-row-gap: 20px;
+    }
+    h2 { margin: 0 0 10px; font-size: 1.5rem; text-align: center; color: var(--primary-color); }
+    label { display: block; font-weight: 600; color: var(--label-color); margin-bottom: 6px; }
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: border-color var(--transition);
+    }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    button {
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      font-size: 1.1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background-color var(--transition), box-shadow var(--transition);
+      width: 100%;
+    }
+    button:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    #successMsg {
+      display: none;
+      text-align: center;
+      padding: 30px;
+      border-radius: var(--radius);
+      background: #eaf8e8;
+      color: #2e7d32;
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    #ticketNumber {
+      display: block;
+      margin-top: 10px;
+      font-size: 1.6rem;
+      color: #1b5e20;
+    }
+    @media (max-width: 480px) {
+      body { padding: 10px; }
+      form { padding: 20px; }
+      h2 { font-size: 1.3rem; }
+    }
   </style>
 </head>
 <body>
   <form id="miFormulario">
     <h2>Crear nuevo ticket</h2>
+
     <div>
       <label for="fecha">Fecha</label>
       <input type="date" id="fecha" name="fecha" required>
     </div>
+
     <div>
       <label for="consorcio">Consorcio</label>
       <input type="text" id="consorcio" name="consorcio" required>
     </div>
+
     <div>
       <label for="piso">Piso</label>
       <select id="piso" name="piso" required>
-        <option value="">Cargando…</option>
+        <option value="">Seleccione un piso</option>
       </select>
     </div>
-    <!-- resto de campos igual -->
+
+    <div>
+      <label for="nombre">Su Nombre</label>
+      <input type="text" id="nombre" name="nombre" required>
+    </div>
+
+    <div>
+      <label for="rubro">Rubro</label>
+      <select id="rubro" name="rubro" required>
+        <option value="" disabled selected>Seleccione un rubro</option>
+        <option value="ELECTRICIDAD">ELECTRICIDAD</option>
+        <option value="PLOMERIA">PLOMERIA</option>
+        <option value="PINTURA">PINTURA</option>
+        <option value="LIMPIEZA">LIMPIEZA</option>
+        <option value="AVERIAS">AVERIAS</option>
+        <option value="OTROS">OTROS</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="descripcion">Descripción</label>
+      <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+    </div>
+
     <div>
       <label for="foto">Foto</label>
       <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
     </div>
+
     <button type="button" id="btnEnviar">Enviar Ticket</button>
   </form>
 
-  <div id="successMsg" style="display:none">
+  <div id="successMsg">
     <p>¡Ticket enviado con éxito!</p>
     <span id="ticketNumber"></span>
     <button onclick="location.reload()">Enviar otro ticket</button>
   </div>
 
   <script>
-    // — URL de tu Web App (la que obtuviste al desplegar el Code.gs) —
+    // — REEMPLAZA por tu URL de Web App desplegado —
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzgF5opU-YfG9Y-gqv-5A8_CtlZG1TJBwCwCAEeLqhrKG2XBukDc4i4J7RifaOuN6mb/exec';
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -51,39 +171,40 @@
       const dd = String(hoy.getDate()).padStart(2,'0');
       document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
 
-      // 2) Leer consorcio desde query param si viene: ?consorcio=XYZ
+      // 2) Leer consorcio desde query param (?consorcio=XYZ)
       const params = new URLSearchParams(window.location.search);
       const cons = params.get('consorcio') || '';
-      document.getElementById('consorcio').value = cons;
+      if (cons) {
+        document.getElementById('consorcio').value = cons;
+        fetchPisos(cons);
+      }
 
-      // 3) Poblar pisos si hay consorcio
-      if (cons) fetchPisos(cons);
-
-      // 4) Cuando cambie el consorcio, recargar pisos
+      // 3) Cuando cambie el consorcio, recargar pisos
       document.getElementById('consorcio').addEventListener('change', e => {
         fetchPisos(e.target.value);
       });
     });
 
-    // Función para pedir pisos
+    // Función para obtener y poblar pisos
     async function fetchPisos(consorcio) {
       const sel = document.getElementById('piso');
       sel.innerHTML = '<option value="">Cargando…</option>';
       try {
         const resp = await fetch(`${WEB_APP_URL}?action=getPisos&consorcio=${encodeURIComponent(consorcio)}`);
-        const json = await resp.json();
+        const { pisos } = await resp.json();
         sel.innerHTML = '';
-        if (json.pisos && json.pisos.length) {
-          json.pisos.forEach(p => {
+        if (pisos.length) {
+          pisos.forEach(p => {
             const opt = document.createElement('option');
-            opt.value = p; opt.textContent = p;
+            opt.value = p; 
+            opt.textContent = p;
             sel.appendChild(opt);
           });
         } else {
-          sel.innerHTML = '<option value="">No hay pisos</option>';
+          sel.innerHTML = '<option value="">No hay pisos disponibles</option>';
         }
       } catch (err) {
-        sel.innerHTML = '<option value="">Error cargando</option>';
+        sel.innerHTML = '<option value="">Error cargando pisos</option>';
         console.error(err);
       }
     }
@@ -97,20 +218,20 @@
 
       const form = document.getElementById('miFormulario');
       const data = {
-        fecha: form.fecha.value,
-        consorcio: form.consorcio.value,
-        piso: form.piso.value,
-        nombre: form.nombre.value,
-        rubro: form.rubro.value,
-        descripcion: form.descripcion.value
+        fecha:      form.fecha.value,
+        consorcio:  form.consorcio.value,
+        piso:       form.piso.value,
+        nombre:     form.nombre.value,
+        rubro:      form.rubro.value,
+        descripcion:form.descripcion.value
       };
 
+      // Si hay foto, la convertimos a Base64
       const fileInput = document.getElementById('foto');
       if (fileInput.files.length) {
         const reader = new FileReader();
         reader.onload = async e => {
-          const base = e.target.result.split(',')[1];
-          data.fotoData = base;
+          data.fotoData = e.target.result.split(',')[1];
           data.fotoType = fileInput.files[0].type;
           data.fotoName = fileInput.files[0].name;
           await enviarData();
